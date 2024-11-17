@@ -18,6 +18,16 @@ import {
   AlertDescription,
 } from "@/components/ui/alert";
 
+// Create axios instance with default config
+const api = axios.create({
+  baseURL: 'https://tawi-xh85.onrender.com/api',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  }
+});
+
 const LoginPage = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -41,21 +51,14 @@ const LoginPage = () => {
     setError(null);
 
     try {
-      const response = await axios.post(
-        'https://tawi-xh85.onrender.com/api/auth/login',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await api.post('/auth/login', formData);
 
       if (response.data && response.data.token) {
         // Store token
         localStorage.setItem('token', response.data.token);
+        
+        // Set token in axios defaults for subsequent requests
+        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
         
         // Redirect to dashboard
         router.push('/dashboard');
@@ -65,12 +68,18 @@ const LoginPage = () => {
     } catch (err) {
       if (axios.isAxiosError(err)) {
         // Handle Axios-specific errors
-        setError(
-          err.response?.data?.error || 
-          err.response?.data?.message || 
-          err.message || 
-          'An error occurred during login'
-        );
+        const errorMessage = err.response?.data?.error || 
+                           err.response?.data?.message || 
+                           (err.code === 'ERR_NETWORK' ? 'Unable to connect to server' : err.message) ||
+                           'An error occurred during login';
+        setError(errorMessage);
+        
+        // Log the detailed error for debugging
+        console.error('Login error:', {
+          status: err.response?.status,
+          data: err.response?.data,
+          headers: err.response?.headers
+        });
       } else {
         setError('An unexpected error occurred');
       }
