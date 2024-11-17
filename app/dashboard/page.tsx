@@ -145,7 +145,7 @@ const DashboardPage: React.FC = () => {
       if (key === 'page') {
         newState.page = typeof value === 'string' ? parseInt(value, 10) : value;
       } else {
-        newState[key] = value as FilterState[typeof key];
+        // newState[key] = value as FilterState[typeof key];
         newState.page = 1;
       }
       return newState;
@@ -274,7 +274,7 @@ const DashboardPage: React.FC = () => {
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 className="flex-1"
-                prefix={<Search className="h-4 w-4 text-gray-400" />}
+                // prefix={<Search className="h-4 w-4 text-gray-400" />}
               />
               <Select
                 value={filters.range}
