@@ -84,12 +84,12 @@ const DashboardPage: React.FC = () => {
 
     try {
       const [statsResponse, transactionsResponse] = await Promise.all([
-        fetch('https://tawi-lea2.onrender.com/api/recharge/statistics', {
+        fetch('https://tawi-xh85.onrender.com/api/recharge/statistics', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         }),
-        fetch(`https://tawi-lea2.onrender.com/api/recharge/transactions?${new URLSearchParams({
+        fetch(`https://tawi-xh85.onrender.com/api/recharge/transactions?${new URLSearchParams({
           page: filters.page.toString(),
           pageSize: filters.pageSize.toString(),
           range: filters.range,
