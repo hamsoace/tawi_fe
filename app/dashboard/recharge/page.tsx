@@ -1,31 +1,61 @@
 'use client';
 
-import { useState } from 'react';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import axios from 'axios';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Alert,
+  AlertDescription,
+} from "@/components/ui/alert";
 
-interface RechargeResponse {
-  success: boolean;
-  responseDesc?: string;
-  error?: string;
-  details?: string;
-}
+// Create axios instance with default config
+const api = axios.create({
+  baseURL: 'https://tawi-xh85.onrender.com/api',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  }
+});
+
+// Set up axios interceptor to add token to all requests
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 const Recharge = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     receiverMsisdn: '',
     amount: '',
-    servicePin: ''
+    pin: '' // Changed from servicePin to pin to match login
   });
+  const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<{
     type: 'success' | 'error' | 'idle';
     message: string;
   }>({ type: 'idle', message: '' });
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const validatePhoneNumber = (phone: string) => {
@@ -35,7 +65,7 @@ const Recharge = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setLoading(true);
     setStatus({ type: 'idle', message: '' });
 
     // Validation
@@ -44,7 +74,7 @@ const Recharge = () => {
         type: 'error',
         message: 'Please enter a valid Kenyan phone number'
       });
-      setIsLoading(false);
+      setLoading(false);
       return;
     }
 
@@ -53,143 +83,158 @@ const Recharge = () => {
         type: 'error',
         message: 'Amount must be between KES 5 and KES 35,000'
       });
-      setIsLoading(false);
+      setLoading(false);
       return;
     }
 
-    if (formData.servicePin.length !== 4) {
+    if (formData.pin.length !== 4) {
       setStatus({
         type: 'error',
         message: 'PIN must be 4 digits'
       });
-      setIsLoading(false);
+      setLoading(false);
       return;
     }
 
     try {
-      const response = await fetch('https://tawi-lea2.onrender.com/api/recharge', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          receiverMsisdn: formData.receiverMsisdn,
-          amount: Number(formData.amount),
-          servicePin: formData.servicePin
-        })
+      const response = await api.post('/recharge', {
+        receiverMsisdn: formData.receiverMsisdn,
+        amount: Number(formData.amount),
+        servicePin: formData.pin // Send the same PIN used for login
       });
 
-      const data: RechargeResponse = await response.json();
-
-      if (data.success) {
+      if (response.data.success || response.data.responseStatus === 'SUCCESS') {
         setStatus({
           type: 'success',
-          message: data.responseDesc || 'Recharge completed successfully!'
+          message: response.data.responseDesc || 'Recharge completed successfully!'
         });
         // Clear form
         setFormData({
           receiverMsisdn: '',
           amount: '',
-          servicePin: ''
+          pin: ''
         });
+      } else {
+        throw new Error(response.data.error || response.data.details || 'Recharge failed');
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        // Handle Axios-specific errors
+        const errorMessage = err.response?.data?.error || 
+                           err.response?.data?.message || 
+                           (err.code === 'ERR_NETWORK' ? 'Unable to connect to server' : err.message) ||
+                           'An error occurred during recharge';
+        setStatus({
+          type: 'error',
+          message: errorMessage
+        });
+        
+        // If unauthorized, redirect to login
+        if (err.response?.status === 401) {
+          router.push('/login');
+        }
       } else {
         setStatus({
           type: 'error',
-          message: data.error || data.details || 'Recharge failed. Please try again.'
+          message: 'An unexpected error occurred'
         });
       }
-    } catch (error) {
-      setStatus({
-        type: 'error',
-        message: 'Network error. Please check your connection and try again.'
-      });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Airtime Recharge</h1>
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="receiverMsisdn" className="block text-sm font-medium mb-1">
-            Recipient Phone Number
-          </label>
-          <input
-            type="tel"
-            id="receiverMsisdn"
-            value={formData.receiverMsisdn}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-            placeholder="e.g., 0712345678"
-            required
-          />
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">Airtime Recharge</CardTitle>
+          <CardDescription>
+            Send airtime to any Safaricom number
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {status.type !== 'idle' && (
+              <Alert variant={status.type === 'success' ? 'default' : 'destructive'}>
+                {status.type === 'success' ? (
+                  <CheckCircle2 className="h-4 w-4" />
+                ) : (
+                  <AlertCircle className="h-4 w-4" />
+                )}
+                <AlertDescription>{status.message}</AlertDescription>
+              </Alert>
+            )}
+            
+            <div className="space-y-2">
+              <label htmlFor="receiverMsisdn" className="block text-sm font-medium text-gray-700">
+                Recipient Phone Number
+              </label>
+              <Input
+                id="receiverMsisdn"
+                name="receiverMsisdn"
+                type="tel"
+                required
+                placeholder="e.g., 0712345678"
+                value={formData.receiverMsisdn}
+                onChange={handleChange}
+                className="w-full"
+              />
+            </div>
 
-        <div>
-          <label htmlFor="amount" className="block text-sm font-medium mb-1">
-            Amount (KES)
-          </label>
-          <input
-            type="number"
-            id="amount"
-            value={formData.amount}
-            onChange={handleChange}
-            min="5"
-            max="35000"
-            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter amount"
-            required
-          />
-        </div>
+            <div className="space-y-2">
+              <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
+                Amount (KES)
+              </label>
+              <Input
+                id="amount"
+                name="amount"
+                type="number"
+                required
+                min="5"
+                max="35000"
+                placeholder="Enter amount"
+                value={formData.amount}
+                onChange={handleChange}
+                className="w-full"
+              />
+            </div>
 
-        <div>
-          <label htmlFor="servicePin" className="block text-sm font-medium mb-1">
-            Service PIN
-          </label>
-          <input
-            type="password"
-            id="servicePin"
-            value={formData.servicePin}
-            onChange={handleChange}
-            maxLength={4}
-            pattern="\d{4}"
-            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter 4-digit PIN"
-            required
-          />
-        </div>
+            <div className="space-y-2">
+              <label htmlFor="pin" className="block text-sm font-medium text-gray-700">
+                PIN
+              </label>
+              <Input
+                id="pin"
+                name="pin"
+                type="password"
+                required
+                maxLength={4}
+                pattern="\d{4}"
+                placeholder="Enter your 4-digit PIN"
+                value={formData.pin}
+                onChange={handleChange}
+                className="w-full"
+              />
+            </div>
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
-                   focus:ring-4 focus:ring-blue-300 disabled:opacity-50 
-                   disabled:cursor-not-allowed transition-colors"
-        >
-          {isLoading ? 'Processing...' : 'Recharge Now'}
-        </button>
-      </form>
-
-      {status.type !== 'idle' && (
-        <Alert className={`mt-4 ${
-          status.type === 'success' ? 'bg-green-50' : 'bg-red-50'
-        }`}>
-          {status.type === 'success' ? (
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
-          ) : (
-            <AlertCircle className="h-4 w-4 text-red-600" />
-          )}
-          <AlertDescription className={`ml-2 ${
-            status.type === 'success' ? 'text-green-800' : 'text-red-800'
-          }`}>
-            {status.message}
-          </AlertDescription>
-        </Alert>
-      )}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                'Recharge Now'
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
