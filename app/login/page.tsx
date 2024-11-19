@@ -54,13 +54,10 @@ const LoginPage = () => {
       const response = await api.post('/auth/login', formData);
 
       if (response.data && response.data.token) {
-        // Store token
         localStorage.setItem('token', response.data.token);
         
-        // Set token in axios defaults for subsequent requests
         api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
         
-        // Redirect to dashboard
         router.push('/dashboard');
       } else {
         throw new Error('Invalid response from server');
