@@ -150,5 +150,3 @@ export const ChangePinPage: React.FC = () => {
       </div>
     );
   };
-  
-  export default ChangePinPage;
