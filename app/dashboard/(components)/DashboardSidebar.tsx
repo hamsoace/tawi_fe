@@ -9,9 +9,10 @@ export const Sidebar: React.FC = () => {
 
   const navItems = [
     { label: 'Dashboard', icon: Menu, link: '/dashboard' },
-    { label: 'Activity', icon: Activity, link: '/dashboard/activity' },
-    { label: 'Settings', icon: Settings, link: '/dashboard/settings' },
+    // { label: 'Activity', icon: Activity, link: '/dashboard/activity' },
+    // { label: 'Settings', icon: Settings, link: '/dashboard/settings' },
     { label: 'Recharge', icon: Menu, link: '/dashboard/recharge' },
+    { label: 'Bulk Recharge', icon: Menu, link: '/dashboard/bulkrecharge' },
   ];
 
   return (
