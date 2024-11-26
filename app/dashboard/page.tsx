@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DashboardCard } from './(components)/DashboardCard';
 import { formatCurrency } from './util/formatCurrency';
+import { Sidebar } from './(components)/DashboardSidebar';
 
 interface Transaction {
   senderMsisdn: string;
@@ -55,6 +56,17 @@ interface FilterState {
   pageSize: number;
   page: number;
 }
+
+const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <div className="flex flex-col md:flex-row min-h-screen">
+      <Sidebar />
+      <main className="flex-1 p-4 md:p-6 overflow-x-auto">
+        {children}
+      </main>
+    </div>
+  );
+};
 
 const DashboardPage: React.FC = () => {
   const [stats, setStats] = useState<any>({
