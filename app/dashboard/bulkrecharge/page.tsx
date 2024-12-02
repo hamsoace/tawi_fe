@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, AlertCircle, CheckCircle2, Upload } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, Upload, Download } from 'lucide-react';
 import axios from 'axios';
 import {
   Card,
@@ -61,6 +61,26 @@ const BulkRecharge = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     setFile(selectedFile || null);
+  };
+
+  const downloadCsvTemplate = () => {
+    // Create a sample CSV content
+    const csvContent = "receiverMsisdn,amount\n254712345678,50\n254711223344,100\n254799887766,75";
+    
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    // Create a link element to trigger the download
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'bulk_recharge_template.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -159,9 +179,20 @@ const BulkRecharge = () => {
             )}
             
             <div className="space-y-2">
-              <label htmlFor="csvFile" className="block text-sm font-medium text-gray-700">
-                CSV File
-              </label>
+              <div className="flex items-center justify-between">
+                <label htmlFor="csvFile" className="block text-sm font-medium text-gray-700">
+                  CSV File
+                </label>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={downloadCsvTemplate}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Template
+                </Button>
+              </div>
               <Input
                 id="csvFile"
                 name="csvFile"
