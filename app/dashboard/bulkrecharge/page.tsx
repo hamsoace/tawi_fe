@@ -86,6 +86,7 @@ const BulkRecharge = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // More robust validation
     if (!file) {
       setStatus({
         type: 'error',
@@ -93,37 +94,37 @@ const BulkRecharge = () => {
       });
       return;
     }
-
-    if (pin.length !== 4) {
+  
+    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
       setStatus({
         type: 'error',
-        message: 'PIN must be 4 digits'
+        message: 'PIN must be exactly 4 digits'
       });
       return;
     }
-
+  
     setLoading(true);
     setStatus({ type: 'idle', message: '' });
-
+  
     const formData = new FormData();
     formData.append('csvFile', file);
     formData.append('servicePin', pin);
-
+  
     try {
       const response = await api.post('/recharge/bulk-recharge', formData);
-
+  
       if (response.data.success) {
         setResults({
-          successfulTransactions: response.data.results,
-          failedTransactions: response.data.errors,
-          totalProcessed: response.data.totalProcessed
+          successfulTransactions: response.data.results || [],
+          failedTransactions: response.data.errors || [],
+          totalProcessed: response.data.totalProcessed || 0
         });
-
+  
         setStatus({
           type: 'success',
-          message: `Processed ${response.data.totalProcessed} transactions`
+          message: `Processed ${response.data.totalProcessed || 0} transactions`
         });
-
+  
         // Reset form
         setFile(null);
         setPin('');
@@ -132,11 +133,14 @@ const BulkRecharge = () => {
         throw new Error(response.data.error || 'Bulk recharge failed');
       }
     } catch (err) {
+      console.error('Bulk recharge error:', err);
+      
       if (axios.isAxiosError(err)) {
         const errorMessage = err.response?.data?.error || 
                            err.response?.data?.message || 
                            (err.code === 'ERR_NETWORK' ? 'Unable to connect to server' : err.message) ||
                            'An error occurred during bulk recharge';
+        
         setStatus({
           type: 'error',
           message: errorMessage
@@ -245,7 +249,7 @@ const BulkRecharge = () => {
             {results && (
               <div className="mt-4">
                 <h3 className="text-lg font-semibold mb-2">Recharge Results</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <Card>
                     <CardHeader>
                       <CardTitle>Successful Transactions</CardTitle>
