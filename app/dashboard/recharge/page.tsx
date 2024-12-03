@@ -20,7 +20,7 @@ import {
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: 'https://tawi-xh85.onrender.com/api',
+  baseURL: 'http://localhost:3001/api',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -78,10 +78,10 @@ const Recharge = () => {
       return;
     }
 
-    if (Number(formData.amount) < 5 || Number(formData.amount) > 35000) {
+    if (Number(formData.amount) < 100 || Number(formData.amount) > 1000) {
       setStatus({
         type: 'error',
-        message: 'Amount must be between KES 5 and KES 35,000'
+        message: 'Amount must be between KES 100 and KES 1,000'
       });
       setLoading(false);
       return;
@@ -99,8 +99,8 @@ const Recharge = () => {
     try {
       const response = await api.post('/recharge', {
         receiverMsisdn: formData.receiverMsisdn,
-        amount: Number(formData.amount),
-        servicePin: formData.pin // Send the same PIN used for login
+        amount: Number(formData.amount) * 100,
+        servicePin: formData.pin 
       });
 
       if (response.data.success || response.data.responseStatus === 'SUCCESS') {
@@ -191,8 +191,8 @@ const Recharge = () => {
                 name="amount"
                 type="number"
                 required
-                min="5"
-                max="35000"
+                min="100"
+                max="1000"
                 placeholder="Enter amount"
                 value={formData.amount}
                 onChange={handleChange}
