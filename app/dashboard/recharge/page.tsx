@@ -78,10 +78,10 @@ const Recharge = () => {
       return;
     }
 
-    if (Number(formData.amount) < 100 || Number(formData.amount) > 1000) {
+    if (Number(formData.amount) < 5 || Number(formData.amount) > 35000) {
       setStatus({
         type: 'error',
-        message: 'Amount must be between KES 100 and KES 1,000'
+        message: 'Amount must be between KES 5 and KES 35,000'
       });
       setLoading(false);
       return;
@@ -191,8 +191,8 @@ const Recharge = () => {
                 name="amount"
                 type="number"
                 required
-                min="100"
-                max="1000"
+                min="5"
+                max="35000"
                 placeholder="Enter amount"
                 value={formData.amount}
                 onChange={handleChange}
