@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import logo from "../../../assets/logo.png";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
+import Image from 'next/image';
 
 const api = axios.create({
   baseURL: 'https://tawi-xh85.onrender.com/api',
@@ -183,7 +185,10 @@ const BulkRecharge = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
+      <div className="mb-8">
+        <Image src={logo} alt="Tawi Pinless" className='h-12 w-auto object-contain' />
+      </div>
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Bulk Airtime Recharge</CardTitle>
@@ -214,6 +219,7 @@ const BulkRecharge = () => {
                   variant="outline" 
                   size="sm" 
                   onClick={downloadCsvTemplate}
+                  className="bg-[#00FFFF] hover:bg-[#FFD700] text-black"
                 >
                   <Download className="mr-2 h-4 w-4" />
                   Download Template
@@ -225,7 +231,7 @@ const BulkRecharge = () => {
                 type="file"
                 accept=".csv"
                 onChange={handleFileChange}
-                className="w-full"
+                className="w-full border-2 border-[#00FFFF] focus:border-[#FFD700] bg-white"
               />
               <p className="text-xs text-gray-500 mt-1">
                 CSV should have columns: receiverMsisdn, amount
@@ -246,13 +252,13 @@ const BulkRecharge = () => {
                 placeholder="Enter your 4-digit PIN"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                className="w-full"
+                className="w-full border-2 border-[#00FFFF] focus:border-[#FFD700] bg-white"
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-[#00FFFF] hover:bg-[#FFD700] text-black"
               disabled={loading}
             >
               {loading ? (
