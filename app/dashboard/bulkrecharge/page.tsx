@@ -107,7 +107,25 @@ const BulkRecharge = () => {
     setStatus({ type: 'idle', message: '' });
   
     const formData = new FormData();
-    formData.append('csvFile', file);
+    
+    // Create a modified CSV file with amount converted to cents
+    if (file) {
+      const fileText = await file.text();
+      const lines = fileText.split('\n');
+      const header = lines[0];
+      const dataLines = lines.slice(1).map(line => {
+        const [msisdn, amount] = line.split(',');
+        // Convert shillings to cents (multiply by 100)
+        const amountInCents = Math.round(parseFloat(amount) * 100);
+        return `${msisdn},${amountInCents}`;
+      });
+      
+      const modifiedCsvContent = [header, ...dataLines].join('\n');
+      const modifiedFile = new File([modifiedCsvContent], file.name, { type: 'text/csv' });
+      
+      formData.append('csvFile', modifiedFile);
+    }
+    
     formData.append('servicePin', pin);
   
     try {
@@ -115,7 +133,11 @@ const BulkRecharge = () => {
   
       if (response.data.success) {
         setResults({
-          successfulTransactions: response.data.results || [],
+          successfulTransactions: response.data.results.map((transaction: any) => ({
+            ...transaction,
+            // Convert cents back to shillings for display
+            amount: (transaction.amount / 100).toFixed(2)
+          })) || [],
           failedTransactions: response.data.errors || [],
           totalProcessed: response.data.totalProcessed || 0
         });
