@@ -123,7 +123,7 @@ const AirtimeRecharge: React.FC = () => {
     }
 
     try {
-      const response = await api.post<ApiResponse>('/airtime', {
+      const response = await api.post<ApiResponse>('/recharge/airtime', {
         receiverMsisdn: formData.receiverMsisdn,
         amount: Number(formData.amount),
         currencyCode: formData.currencyCode
