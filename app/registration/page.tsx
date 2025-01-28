@@ -181,14 +181,14 @@ const Registration: React.FC = () => {
                 htmlFor="username"
                 className="block text-sm font-medium text-gray-700"
               >
-                Username
+                Full Name
               </label>
               <Input
                 id="username"
                 name="username"
                 type="text"
                 required
-                placeholder="Enter username"
+                placeholder="Enter Full Name"
                 value={formData.username}
                 onChange={handleChange}
                 className="w-full"

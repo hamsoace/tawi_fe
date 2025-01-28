@@ -16,7 +16,7 @@ export const Sidebar: React.FC = () => {
     { label: 'Dashboard', icon: Menu, link: '/dashboard' },
     { label: 'Recharge', icon: CircleDollarSign, link: '/dashboard/recharge' },
     { label: 'Bulk Recharge', icon: Wallet, link: '/dashboard/bulkrecharge' },
-    { label: 'Airtel Recharge', icon: HandCoins, link: '/dashboard/airtel_recharge' },
+    { label: 'Other Networks', icon: HandCoins, link: '/dashboard/airtel_recharge' },
     { label: 'Registration', icon: UserPen, link: '/dashboard/register' },
   ];
 
