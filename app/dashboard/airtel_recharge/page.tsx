@@ -129,6 +129,7 @@ const AirtimeRecharge: React.FC = () => {
         currencyCode: formData.currencyCode
       });
 
+      console.log(response.data);
       if (response.data.success) {
         setStatus({
           type: 'success',

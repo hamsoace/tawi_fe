@@ -219,7 +219,7 @@ const BulkRecharge = () => {
                   variant="outline" 
                   size="sm" 
                   onClick={downloadCsvTemplate}
-                  className="bg-[#00FFFF] hover:bg-[#FFD700] text-black"
+                  className="bg-[#D1D1D1] hover:bg-[#6A6A6A] text-black"
                 >
                   <Download className="mr-2 h-4 w-4" />
                   Download Template
@@ -231,7 +231,7 @@ const BulkRecharge = () => {
                 type="file"
                 accept=".csv"
                 onChange={handleFileChange}
-                className="w-full border-2 border-[#00FFFF] focus:border-[#FFD700] bg-white"
+                className="w-full border-2 border-[#D1D1D1] focus:border-[#6A6A6A] bg-white"
               />
               <p className="text-xs text-gray-500 mt-1">
                 CSV should have columns: receiverMsisdn, amount
@@ -252,13 +252,13 @@ const BulkRecharge = () => {
                 placeholder="Enter your 4-digit PIN"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                className="w-full border-2 border-[#00FFFF] focus:border-[#FFD700] bg-white"
+                className="w-full border-2 border-[#D1D1D1] focus:border-[#6A6A6A] bg-white"
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full bg-[#00FFFF] hover:bg-[#FFD700] text-black"
+              className="w-full bg-[#D1D1D1] hover:bg-[#6A6A6A] text-black"
               disabled={loading}
             >
               {loading ? (

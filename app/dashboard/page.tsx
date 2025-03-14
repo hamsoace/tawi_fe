@@ -35,6 +35,7 @@ import { Input } from "@/components/ui/input";
 import { DashboardCard } from './(components)/DashboardCard';
 import { formatCurrency } from './util/formatCurrency';
 import { Sidebar } from './(components)/DashboardSidebar';
+import { formatCurrencyFromCents } from '@/lib/utils';
 
 interface Transaction {
   senderMsisdn: string;
@@ -56,6 +57,7 @@ interface FilterState {
   pageSize: number;
   page: number;
 }
+
 
 const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
@@ -353,7 +355,8 @@ const DashboardPage: React.FC = () => {
                           {transaction.status}
                         </span>
                         <p className="font-medium text-gray-800">
-                          {formatCurrency(transaction.amount)}
+                          {formatCurrencyFromCents(transaction.amount)}        
+
                         </p>
                       </div>
                     </div>
