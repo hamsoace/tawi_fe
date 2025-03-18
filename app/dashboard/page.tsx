@@ -215,7 +215,7 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <DashboardCard
           title="Spent this month"
-          value={formatCurrency(stats.monthlyTotal)}
+          value={formatCurrencyFromCents(stats.monthlyTotal)}
           icon={DollarSign}
           chart
         />
@@ -226,7 +226,7 @@ const DashboardPage: React.FC = () => {
         />
         <DashboardCard
           title="Activity"
-          value={formatCurrency(stats.monthlyTotal * 0.8)}
+          value={formatCurrencyFromCents(stats.monthlyTotal * 0.8)}
           icon={Activity}
           chart
         />
@@ -257,7 +257,7 @@ const DashboardPage: React.FC = () => {
                   <XAxis dataKey="name" />
                   <YAxis tickFormatter={(value) => `KES ${value/1000}K`} />
                   <Tooltip 
-                    formatter={(value: any) => [`KES ${formatCurrency(value)}`, 'Amount']}
+                    formatter={(value: any) => [`KES ${formatCurrencyFromCents(value)}`, 'Amount']}
                   />
                   <Line 
                     type="monotone" 
@@ -414,7 +414,7 @@ const DashboardPage: React.FC = () => {
                   <XAxis dataKey="name" />
                   <YAxis tickFormatter={(value) => `KES ${value/1000}K`} />
                   <Tooltip 
-                    formatter={(value: any) => [`KES ${formatCurrency(value)}`, 'Amount']}
+                    formatter={(value: any) => [`KES ${formatCurrencyFromCents(value)}`, 'Amount']}
                   />
                   <Bar 
                     dataKey="amount" 
